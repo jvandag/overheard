@@ -11,8 +11,8 @@
     "build:pkg": "pkg .",
     "make": "run-s build build:pkg",
     "lint": "eslint .",
-    "prettify": "prettier -c --write \"**/*.{js,json,ts}\"",
-    "prettify:check": "prettier --list-different \"**/*.{js,json,ts}\"",
+    "prettify": "prettier -c --write \"**/*.{cjs,mjs,js,json,ts}\"",
+    "prettify:check": "prettier --list-different \"**/*.{cjs,mjs,js,json,ts}\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
