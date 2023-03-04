@@ -1,1 +1,12 @@
 * text=auto
+
+*.md               text diff=markdown
+*.json             text
+package-lock.json  text -diff
+
+*.sh               text eol=lf
+
+*.cjs              text
+*.mjs              text
+*.js               text
+*.ts               text
