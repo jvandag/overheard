@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events'
 import { JSDOM } from 'jsdom'
+import fetch from 'isomorphic-fetch'
 import {
   OVERHEARD_NO_REPORTS,
   OVERHEARD_ORB_NAMES,
@@ -57,7 +58,7 @@ export class Overheard extends EventEmitter {
     return await new Promise((resolve, reject) => {
       const app = new Command('overheard')
       app
-        .option('-t, --time <time>', 'scan interval', timeunit)
+        .option('-t, --time <time>', 'scan interval', timeunit, -1)
         .option('-q, --quiet', 'disable output', false)
         .version(OVERHEARD_VERSION, '-v, --version')
         .action((opts) => {
@@ -139,11 +140,11 @@ export class Overheard extends EventEmitter {
    * @returns
    */
   parseMoon(line: string): MoonPhase {
-    const match = /^The\smoon\sis\sa\s(.*?)\.$/.exec(line)
+    const match = /^The\smoon\sis\s((in\sits|a)\s)?(.*?)\.$/.exec(line)
     if (match === null) {
       throw new Error('Failed to parse moon!')
     }
-    return match[1].toLowerCase().replace(/\s/g, '_') as MoonPhase
+    return match[3].toLowerCase().replace(/\s/g, '_') as MoonPhase
   }
 
   /**
