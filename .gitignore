@@ -1,7 +1,8 @@
 .vs*
 .idea
-
 .yarn
+
+*.sqlite
 
 # Logs
 logs

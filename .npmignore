@@ -2,6 +2,7 @@
 .eslint*
 .prettier*
 .editor*
+*.sqlite
 *.tgz
 
 scripts

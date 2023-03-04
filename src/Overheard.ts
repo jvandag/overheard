@@ -44,7 +44,7 @@ export class Overheard extends EventEmitter {
       ),
       ...cache,
     }
-    this._interval = opts?.time ?? 10e3
+    this._interval = opts?.time ?? Infinity
     this._quiet = opts?.quiet ?? true
   }
 
@@ -58,7 +58,7 @@ export class Overheard extends EventEmitter {
     return await new Promise((resolve, reject) => {
       const app = new Command('overheard')
       app
-        .option('-t, --time <time>', 'scan interval', timeunit, -1)
+        .option('-t, --time <time>', 'scan interval', timeunit)
         .option('-q, --quiet', 'disable output', false)
         .version(OVERHEARD_VERSION, '-v, --version')
         .action((opts) => {
@@ -209,9 +209,11 @@ export class Overheard extends EventEmitter {
           })
         }
         // Schedule next scan
-        this.timeout = setTimeout(() => {
-          this.next()
-        }, this._interval)
+        if (isFinite(this._interval)) {
+          this.timeout = setTimeout(() => {
+            this.next()
+          }, this._interval)
+        }
       })
       .catch((err) => {
         if (err instanceof Error) {
