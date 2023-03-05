@@ -15,6 +15,10 @@ insert() {
 
 export -f insert
 
+[[ "${1##*.}" != "sqlite" ]] \
+  && echo "Error: path \"$1\" is invalid!" >&2 \
+  && exit 1
+
 sqlite3 "$1" <<EOF
 CREATE TABLE IF NOT EXISTS alerts (id INTEGER PRIMARY KEY, name TEXT, phase TEXT, date INTEGER);
 CREATE TABLE IF NOT EXISTS online (id INTEGER PRIMARY KEY, count INTEGER, date INTEGER);
