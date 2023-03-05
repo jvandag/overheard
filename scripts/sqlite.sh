@@ -1,26 +1,44 @@
 #!/usr/bin/env bash
 
+FILEPATH="$1"
+
 insert() {
   local time="$(date +"%d/%m/%Y-%T")"
   local date="$(date +%s)"
-  if [[ "$2" == "online:" ]]; then
-    echo "$time online $3"
-    sqlite3 "$1" "INSERT INTO online (count, date) VALUES ('$3', '$date');"
-  fi
-  if [[ "$2" == "scroll:" ]]; then
-    echo "$time scroll $3 $4"
-    sqlite3 "$1" "INSERT INTO alerts (name, phase, date) VALUES ('$3', '$4', '$date');"
-  fi
+  case "$1" in
+    "online:" )
+      echo "$time online $2 $3"
+      sqlite3 "$FILEPATH" \
+        "INSERT INTO online (count, date) VALUES ('$2', '$date');"
+      ;;
+    "scroll:" )
+      echo "$time scroll $2 $3"
+      sqlite3 "$FILEPATH" \
+        "INSERT INTO alerts (name, phase, date) VALUES ('$2', '$3', '$date');"
+    ;;
+  esac
+}
+
+listen() {
+  node dist/index.js -t 10s | xargs -I {} bash -c 'insert {}'
 }
 
 export -f insert
+export FILEPATH
 
-[[ "${1##*.}" != "sqlite" ]] \
-  && echo "Error: path \"$1\" is invalid!" >&2 \
+# Main
+[[ "${FILEPATH##*.}" != "sqlite" ]] \
+  && echo "Error: path \"$FILEPATH\" is invalid!" >&2 \
   && exit 1
 
-sqlite3 "$1" <<EOF
+# Create tables
+sqlite3 "$FILEPATH" <<EOF
 CREATE TABLE IF NOT EXISTS alerts (id INTEGER PRIMARY KEY, name TEXT, phase TEXT, date INTEGER);
 CREATE TABLE IF NOT EXISTS online (id INTEGER PRIMARY KEY, count INTEGER, date INTEGER);
 EOF
-node dist/index.js -t 10s | xargs -I {} bash -c "insert \"$1\" {}"
+
+# Start listener
+until listen; do
+  echo "Scraper crashed with code $? restarting..." >&2 \
+    && sleep 10
+done
