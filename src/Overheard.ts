@@ -162,8 +162,8 @@ export class Overheard extends EventEmitter {
     if (match === null) {
       throw new Error('Failed to parse scrolls!')
     }
-    const phase = match[2] as OrbPhase
-    return match[1].split('and').map((v) => ({
+    const phase = match.pop() as OrbPhase
+    return match[1].replace(' and', '').split(/[\s,]/g).map((v) => ({
       name: v.trim().toLowerCase() as SchoolName,
       phase,
     }))
