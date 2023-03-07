@@ -21,7 +21,7 @@ overheard_sqlite_insert() {
 
 overheard_sqlite_boot() {
   local time="$(date +"%d/%m/%Y-%T")"
-  echo "$1 $time"
+  echo "$time $1"
   sqlite3 "$OVERHEARD_SQLITE_FILEPATH" "INSERT INTO boot (type, date) VALUES ('$1', '$time');"
 }
 
@@ -32,7 +32,7 @@ overheard_sqlite_listen() {
 
 export -f overheard_sqlite_insert
 
-# Main
+# Check file path
 [[ "${OVERHEARD_SQLITE_FILEPATH##*.}" != "sqlite" ]] \
   && echo "Error: path \"$OVERHEARD_SQLITE_FILEPATH\" is invalid!" >&2 \
   && exit 1
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS alerts (id INTEGER PRIMARY KEY, name TEXT, phase TEXT
 CREATE TABLE IF NOT EXISTS online (id INTEGER PRIMARY KEY, count INTEGER, date TEXT);
 EOF
 
-# Start listener
+# Main
 trap "overheard_sqlite_boot 'exit'" EXIT \
   && overheard_sqlite_boot 'start'
 
