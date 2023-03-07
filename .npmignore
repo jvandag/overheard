@@ -1,8 +1,8 @@
-.git*
-.eslint*
-.prettier*
-.editor*
-*.sqlite
-*.tgz
+*
+!README.md
+!LICENSE
 
-scripts
+!dist/**/*
+!types/**/*
+!package.json
+!tsconfig.json
