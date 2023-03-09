@@ -10,6 +10,7 @@ import {
 import type {
   GameState,
   MoonPhase,
+  Options,
   OrbPhase,
   OverheardCache,
   OverheardEvent,
@@ -33,7 +34,7 @@ export class Overheard extends EventEmitter {
    * @param cache - Stored values
    */
   constructor(
-    opts?: Partial<OverheardOptions>,
+    opts?: Partial<Options>,
     cache: Partial<OverheardCache> = {},
   ) {
     super()
@@ -264,6 +265,8 @@ export class Overheard extends EventEmitter {
           this.timeout = setTimeout(() => {
             this.next()
           }, this._interval)
+        } else {
+          this.emit('done', undefined)
         }
       })
       .catch((err) => {
