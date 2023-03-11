@@ -2,6 +2,7 @@
 .idea
 .yarn
 
+pnpm-lock.yaml
 *.sqlite
 
 # Logs
