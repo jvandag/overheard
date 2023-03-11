@@ -33,10 +33,7 @@ export class Overheard extends EventEmitter {
    * @param opts  - Scraper opts
    * @param cache - Stored values
    */
-  constructor(
-    opts?: Partial<Options>,
-    cache: Partial<OverheardCache> = {},
-  ) {
+  constructor(opts?: Partial<Options>, cache: Partial<OverheardCache> = {}) {
     super()
     this._cache = {
       online: null,
