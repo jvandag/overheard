@@ -21,6 +21,7 @@ over
   .on('done', () => {
     // About to exit
   })
+  .start() // Start the scraper
 ```
 
 ### Command-line usage:

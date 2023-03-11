@@ -6,7 +6,7 @@
   "bin": "dist/index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "clean": "rimraf dist",
+    "clean": "rimraf bin dist",
     "build": "tsc",
     "build:dev": "tsc --sourceMap",
     "build:pkg": "pkg .",
