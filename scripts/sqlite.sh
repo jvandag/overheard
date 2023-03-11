@@ -7,14 +7,14 @@ overheard_sqlite_insert() {
   local time="$(date +"%d/%m/%Y-%T")"
   case "$1" in
     "online:" )
-      echo "$time online $2 $3"
+      echo "$time online $2"
       sqlite3 "$OVERHEARD_SQLITE_FILEPATH" \
         "INSERT INTO online (count, date) VALUES ('$2', '$time');"
       ;;
     "scroll:" )
       echo "$time scroll $2 $3"
       sqlite3 "$OVERHEARD_SQLITE_FILEPATH" \
-        "INSERT INTO alerts (name, phase, date) VALUES ('$2', '$3', '$time');"
+        "INSERT INTO scrolls (name, phase, date) VALUES ('$2', '$3', '$time');"
     ;;
   esac
 }
@@ -22,7 +22,7 @@ overheard_sqlite_insert() {
 overheard_sqlite_boot() {
   local time="$(date +"%d/%m/%Y-%T")"
   echo "$time $1"
-  sqlite3 "$OVERHEARD_SQLITE_FILEPATH" "INSERT INTO boot (type, date) VALUES ('$1', '$time');"
+  sqlite3 "$OVERHEARD_SQLITE_FILEPATH" "INSERT INTO meta (type, date) VALUES ('$1', '$time');"
 }
 
 overheard_sqlite_listen() {
@@ -39,8 +39,8 @@ export -f overheard_sqlite_insert
 
 # Create tables
 sqlite3 "$OVERHEARD_SQLITE_FILEPATH" <<EOF
-CREATE TABLE IF NOT EXISTS boot (id INTEGER PRIMARY KEY, type TEXT, date TEXT);
-CREATE TABLE IF NOT EXISTS alerts (id INTEGER PRIMARY KEY, name TEXT, phase TEXT, date TEXT);
+CREATE TABLE IF NOT EXISTS meta (id INTEGER PRIMARY KEY, type TEXT, date TEXT);
+CREATE TABLE IF NOT EXISTS scrolls (id INTEGER PRIMARY KEY, name TEXT, phase TEXT, date TEXT);
 CREATE TABLE IF NOT EXISTS online (id INTEGER PRIMARY KEY, count INTEGER, date TEXT);
 EOF
 
