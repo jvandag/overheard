@@ -10,3 +10,4 @@ package-lock.json  text -diff
 *.mjs              text
 *.js               text
 *.ts               text
+*.py               text
