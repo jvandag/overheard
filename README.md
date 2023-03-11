@@ -18,6 +18,9 @@ over
   .on('scrolls', (scrolls) => {
     console.log(scrolls) // [{ name: 'enchantment', phase: 'dark' }, ...]
   })
+  .on('done', () => {
+    // About to exit
+  })
 ```
 
 ### Command-line usage:
