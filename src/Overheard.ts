@@ -257,7 +257,8 @@ export class Overheard extends EventEmitter {
             this._cache.scrolls[s.name] = s.phase
           })
         }
-        // Schedule next scan
+      })
+      .finally(() => {
         if (isFinite(this._interval)) {
           this.timeout = setTimeout(() => {
             this.next()
