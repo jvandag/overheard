@@ -41,11 +41,7 @@ export class Overheard extends EventEmitter {
     this._cache = {
       online: null,
       moon: null,
-      scrolls: {
-        abjuration: 'dark',
-        divination: 'dark',
-        evocation: 'dark',
-      },
+      scrolls: {},
       ...cache,
     }
     this._interval = opts?.time ?? Infinity
