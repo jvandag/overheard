@@ -1,6 +1,5 @@
 import { EventEmitter } from 'events'
 import { JSDOM } from 'jsdom'
-import fetch from 'isomorphic-fetch'
 import {
   OVERHEARD_NO_REPORTS,
   OVERHEARD_URL,
@@ -18,6 +17,10 @@ import type {
   SchoolName,
   ScrollState,
 } from '../types/index'
+
+if (typeof fetch === 'undefined') {
+  import('isomorphic-fetch')
+}
 
 /**
  * Simple overheard scraper
@@ -38,7 +41,11 @@ export class Overheard extends EventEmitter {
     this._cache = {
       online: null,
       moon: null,
-      scrolls: {},
+      scrolls: {
+        abjuration: 'dark',
+        divination: 'dark',
+        evocation: 'dark',
+      },
       ...cache,
     }
     this._interval = opts?.time ?? Infinity
@@ -128,7 +135,7 @@ export class Overheard extends EventEmitter {
     const phase = match.pop()?.toLowerCase() as OrbPhase
     return match[1]
       .replace('and', '')
-      .split(',')
+      .split(/[\s,]+/g)
       .map((n) => ({
         name: n.trim().toLowerCase() as SchoolName,
         phase,
