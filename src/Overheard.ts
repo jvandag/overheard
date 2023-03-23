@@ -18,10 +18,6 @@ import type {
   ScrollState,
 } from '../types/index'
 
-if (typeof fetch === 'undefined') {
-  import('isomorphic-fetch')
-}
-
 /**
  * Simple overheard scraper
  * @class
@@ -252,7 +248,7 @@ export class Overheard extends EventEmitter {
           this._cache.online = newState.online
         }
         if (
-          newState.scrolls.length > 1 &&
+          newState.scrolls.length > 0 &&
           newState.scrolls.some((s) => this._cache.scrolls[s.name] !== s.phase)
         ) {
           this.emit('scrolls', newState.scrolls)

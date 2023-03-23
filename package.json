@@ -2,8 +2,8 @@
   "name": "@aberoth-community/overheard",
   "version": "1.1.2",
   "description": "A simple overheard scraper",
-  "main": "dist/index.js",
-  "bin": "dist/index.js",
+  "main": "./dist/index.js",
+  "type": "commonjs",
   "scripts": {
     "start": "ts-node src/index.ts",
     "clean": "rimraf bin dist",
@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/aberoth-community/overheard#readme",
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "pkg": {
     "outputPath": "bin"
