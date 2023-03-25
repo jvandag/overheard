@@ -58,8 +58,14 @@ describe('Overheard', () => {
       .on('moon', cbMoonMock)
       .on('online', cbOnlineMock)
       .on('done', () => {
-        expect(cbMoonMock).toHaveBeenCalledWith(expect.stringMatching(/^(new|waxing_crescent|first_quarter|waxing_gibbous|nearly_full|full|waning_gibbous|third_quarter|waning_crescent|nearly_new)$/))
-        expect(cbOnlineMock).toHaveBeenCalledWith(expect.arrayContaining([expect.any(Number), null]))
+        expect(cbMoonMock).toHaveBeenCalledWith(
+          expect.stringMatching(
+            /^(new|waxing_crescent|first_quarter|waxing_gibbous|nearly_full|full|waning_gibbous|third_quarter|waning_crescent|nearly_new)$/,
+          ),
+        )
+        expect(cbOnlineMock).toHaveBeenCalledWith(
+          expect.arrayContaining([expect.any(Number), null]),
+        )
         expect(cbScrollsMock).toHaveBeenCalledWith(expect.any(Array))
       })
       .start()
