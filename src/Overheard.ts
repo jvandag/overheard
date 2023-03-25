@@ -2,6 +2,7 @@ import { EventEmitter } from 'events'
 import { JSDOM } from 'jsdom'
 import {
   OVERHEARD_NO_REPORTS,
+  OVERHEARD_SCHOOL_NAMES,
   OVERHEARD_URL,
   OVERHEARD_VERSION,
 } from './util/variables'
@@ -37,7 +38,9 @@ export class Overheard extends EventEmitter {
     this._cache = {
       online: null,
       moon: null,
-      scrolls: {},
+      scrolls: Object.values(OVERHEARD_SCHOOL_NAMES).reduce((acc, cur) => {
+        return { ...acc, [cur]: 'normal' }
+      }, {}),
       ...cache,
     }
     this._interval = opts?.time ?? Infinity
