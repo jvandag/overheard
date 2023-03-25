@@ -3,6 +3,7 @@
   "version": "1.2.0",
   "description": "A simple overheard scraper",
   "main": "./dist/index.js",
+  "bin": "./dist/index.js",
   "type": "commonjs",
   "scripts": {
     "start": "ts-node src/index.ts",
