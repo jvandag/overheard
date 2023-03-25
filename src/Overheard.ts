@@ -229,9 +229,9 @@ export class Overheard extends EventEmitter {
    * @returns
    */
   scrolls(): ScrollState[] {
-    return (Object.entries(this._cache) as Array<[SchoolName, OrbPhase]>).map(
-      ([name, phase]) => ({ name, phase }),
-    )
+    return (
+      Object.entries(this._cache.scrolls) as Array<[SchoolName, OrbPhase]>
+    ).map(([name, phase]) => ({ name, phase }))
   }
 
   /** Scraper loop */
