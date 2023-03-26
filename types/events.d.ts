@@ -45,7 +45,7 @@ export interface GameState {
 /** Overheard class events */
 export interface OverheardEvent {
   done: undefined
-  online: [number, number | null]
+  online: number
   moon: MoonPhase
-  scrolls: ScrollState[]
+  scrolls: ScrollState
 }

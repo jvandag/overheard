@@ -12,11 +12,11 @@ if (require.main === module) {
             console.log(`moon: ${state}`)
           })
           .on('online', (count) => {
-            console.log(`online: ${count.join(' ')}`)
+            console.log(`online: ${count}`)
           })
-          .on('scrolls', (state) => {
+          .on('scrolls', (s) => {
             console.log(
-              state.map((s) => `scroll: ${s.name} ${s.phase}`).join('\n'),
+              `scroll: ${s.name} ${s.phase}`
             )
           })
       }

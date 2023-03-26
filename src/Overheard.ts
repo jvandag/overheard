@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
-import { JSDOM } from 'jsdom'
 import {
-  OVERHEARD_NO_REPORTS,
+  OVERHEARD_MOON_STATES,
+  OVERHEARD_ORB_STATES,
   OVERHEARD_SCHOOL_NAMES,
   OVERHEARD_URL,
   OVERHEARD_VERSION,
@@ -25,7 +25,7 @@ import type {
  */
 export class Overheard extends EventEmitter {
   private readonly _cache: OverheardCache
-  private readonly _interval: number
+  private readonly _opts: Partial<Options>
   private timeout?: NodeJS.Timeout
 
   /**
@@ -36,14 +36,14 @@ export class Overheard extends EventEmitter {
   constructor(opts?: Partial<Options>, cache: Partial<OverheardCache> = {}) {
     super()
     this._cache = {
-      online: null,
-      moon: null,
       scrolls: Object.values(OVERHEARD_SCHOOL_NAMES).reduce((acc, cur) => {
         return { ...acc, [cur]: 'normal' }
       }, {}),
       ...cache,
     }
-    this._interval = opts?.time ?? Infinity
+    this._opts = {
+      ...opts,
+    }
   }
 
   /**
@@ -67,96 +67,91 @@ export class Overheard extends EventEmitter {
   }
 
   /**
-   * Fetch DOM from url
+   * Fetch text
    * @param url - Page url
-   * @returns   - Page DOM
+   * @returns   - Page text
    */
-  private async fetchDOM(url: string): Promise<JSDOM> {
-    const res = await fetch(url)
+  private async fetch(url: string): Promise<string> {
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: this._opts?.headers,
+    })
     if (!res.ok) {
       throw new Error(`[${res.status}] ${res.statusText}`)
     }
-    return new JSDOM(await res.text())
+    return await res.text()
   }
 
   /**
-   * Parse online champions
-   * @param line - Text input
-   * @returns - Online players
+   * Parse overheard html
+   * @param text - Page text
+   * @returns    - Game state
    */
-  private parseOnline(line: string): number {
-    const match = /(\d+)/g.exec(line)
-    if (match === null || isNaN(parseInt(match[1], 10))) {
-      throw new Error('Failed to parse online champions!')
+  private parse(text: string): GameState {
+    const [_f, _online, _moon, _s, scrolls, phase] =
+      /There\sare\s(\d+)\schampions\sadventuring\sacross\sthe\srealms\s\w+,\smore\sor\sless\..*?The\smoon\sis\s?a?\s([\w\s]+)\.<br><br>(Rumor\shas\sit\sthat\s(.*)\sscrolls\sare\s(dark|glowing)\.)?/.exec(
+        text,
+      ) ?? []
+    const online = parseInt(_online, 10)
+    const moon = _moon.replace(/\s/g, '_')
+    if (typeof _f !== 'string') {
+      throw new Error('failed parse, invalid content!')
     }
-    return parseInt(match[1], 10)
-  }
-
-  /**
-   * Parse moon state
-   * @param line - Text input
-   * @returns - Moon state
-   */
-  private parseMoon(line: string): MoonPhase {
-    const match = /^The\smoon\sis\s((in\sits|a)\s)?(.*?)\.$/.exec(line)
-    if (match === null) {
-      throw new Error('Failed to parse moon!')
+    if (isNaN(online)) {
+      throw new Error(`failed parse, invalid online: "${online}"!`)
     }
-    return match[3].toLowerCase().replace(/\s/g, '_') as MoonPhase
-  }
-
-  /**
-   * Parse scroll states
-   * @param line - Text input
-   * @returns - Changed scrolls
-   */
-  private parseScrolls(line: string): ScrollState[] {
-    if (line === OVERHEARD_NO_REPORTS) {
-      const entries: Array<[SchoolName, OrbPhase]> = Object.entries(
-        this._cache.scrolls,
-      ) as any
-      if (entries.some((c) => c[1] !== 'normal')) {
-        return entries
-          .filter((c) => c[1] !== 'normal')
-          .map((c) => ({ name: c[0], phase: 'normal' }))
-      }
-      return []
+    if (!(moon.replace(/\s/g, '_').toUpperCase() in OVERHEARD_MOON_STATES)) {
+      throw new Error(`failed parse, unknown moon phase: "${moon}"!`)
     }
-    const match =
-      /^Rumor\shas\sit\sthat\s(.*?)\sscrolls\sare\s(glowing|dark)\.$/.exec(line)
-    if (match === null) {
-      throw new Error('Failed to parse scrolls!')
-    }
-    const phase = match.pop()?.toLowerCase() as OrbPhase
-    return match[1]
-      .replace('and', '')
-      .split(/[\s,]+/g)
-      .map((n) => ({
-        name: n.trim().toLowerCase() as SchoolName,
-        phase,
-      }))
-  }
-
-  /**
-   * Parse Overheard DOM
-   * @param dom - Page dom
-   * @returns   - Game state
-   */
-  private parse(dom: JSDOM): GameState {
-    const document = dom.window.document
-    const lines = Array.from(
-      document.querySelector('div:nth-child(2)')?.childNodes ?? [],
-    )
-      .filter((e) => e.nodeName === '#text')
-      .map((e) => e.textContent) as string[]
-    if (lines.length > 3) {
-      throw new Error('Failed to fetch text!')
+    if (
+      typeof _s === 'string' &&
+      !(phase.toUpperCase() in OVERHEARD_ORB_STATES)
+    ) {
+      throw new Error(`failed parse, unknown scroll phase: "${phase}"!`)
     }
     return {
-      moon: this.parseMoon(lines[1]),
-      online: this.parseOnline(lines[0]),
-      scrolls: this.parseScrolls(lines[2]),
+      moon: moon.replace(/\s/g, '_') as MoonPhase,
+      online,
+      scrolls:
+        scrolls?.split(/[,\s]+and\s/g)?.map((name): ScrollState => {
+          if (
+            !Object.values(OVERHEARD_SCHOOL_NAMES).includes(name as SchoolName)
+          ) {
+            throw new Error(`failed parse, unknown scroll name: "${name}"!`)
+          }
+          return {
+            name: name as SchoolName,
+            phase: phase as OrbPhase,
+          }
+        }) ?? [],
     }
+  }
+
+  /**
+   * Diff cache & emit events
+   * @param state - New state
+   */
+  private diff(state: GameState): void {
+    if (state.moon !== this._cache.moon) {
+      this.emit('moon', state.moon)
+      this._cache.moon = state.moon
+    }
+    if (state.online !== this._cache.online) {
+      this.emit('online', state.online)
+      this._cache.online = state.online
+    }
+    this.scrolls().forEach(({ name, phase }) => {
+      const scroll = state.scrolls.find((s) => s.name === name)
+      if (typeof scroll !== 'undefined') {
+        if (scroll.phase !== phase) {
+          this._cache.scrolls[name] = scroll.phase
+          this.emit('scrolls', scroll)
+        }
+      } else if (phase === 'dark' || phase === 'glowing') {
+        this._cache.scrolls[name] = 'normal'
+        this.emit('scrolls', { name, phase: 'normal' })
+      }
+    })
   }
 
   /**
@@ -223,7 +218,7 @@ export class Overheard extends EventEmitter {
    * Get moon phase
    * @returns
    */
-  moon(): MoonPhase | null {
+  moon(): MoonPhase | undefined {
     return this._cache.moon
   }
 
@@ -239,32 +234,14 @@ export class Overheard extends EventEmitter {
 
   /** Scraper loop */
   next(): void {
-    this.fetchDOM(OVERHEARD_URL)
-      .then((dom) => this.parse(dom))
-      .then((newState) => {
-        if (newState.moon !== this._cache.moon) {
-          this.emit('moon', newState.moon)
-          this._cache.moon = newState.moon
-        }
-        if (newState.online !== this._cache.online) {
-          this.emit('online', [newState.online, this._cache.online])
-          this._cache.online = newState.online
-        }
-        if (
-          newState.scrolls.length > 0 &&
-          newState.scrolls.some((s) => this._cache.scrolls[s.name] !== s.phase)
-        ) {
-          this.emit('scrolls', newState.scrolls)
-          newState.scrolls.forEach((s) => {
-            this._cache.scrolls[s.name] = s.phase
-          })
-        }
-      })
+    this.fetch(OVERHEARD_URL)
+      .then((html) => this.parse(html))
+      .then((state) => this.diff(state))
       .finally(() => {
-        if (isFinite(this._interval)) {
+        if (!isNaN(this._opts?.time ?? NaN)) {
           this.timeout = setTimeout(() => {
             this.next()
-          }, this._interval)
+          }, this._opts.time)
         } else {
           this.emit('done', undefined)
         }
@@ -278,9 +255,8 @@ export class Overheard extends EventEmitter {
 
   /** Stop scraper */
   stop(): void {
+    this._opts.time = NaN
     clearTimeout(this.timeout)
-    // @ts-expect-error - Disable next loop
-    this._interval = Infinity
   }
 
   /** Start scraper */

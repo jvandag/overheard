@@ -1,7 +1,7 @@
 import type { MoonPhase, OrbPhase, SchoolName } from './events'
 
 export interface OverheardCache {
-  online: number | null
-  moon: MoonPhase | null
+  online?: number
+  moon?: MoonPhase
   scrolls: Partial<Record<SchoolName, OrbPhase>>
 }
