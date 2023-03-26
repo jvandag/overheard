@@ -93,24 +93,24 @@ export class Overheard extends EventEmitter {
         text,
       ) ?? []
     const online = parseInt(_online, 10)
-    const moon = _moon.replace(/\s/g, '_')
+    const moon = _moon?.replace(/\s/g, '_')
     if (typeof _f !== 'string') {
       throw new Error('failed parse, invalid content!')
     }
     if (isNaN(online)) {
       throw new Error(`failed parse, invalid online: "${online}"!`)
     }
-    if (!(moon.replace(/\s/g, '_').toUpperCase() in OVERHEARD_MOON_STATES)) {
+    if (typeof moon !== 'string' || !(moon?.toUpperCase() in OVERHEARD_MOON_STATES)) {
       throw new Error(`failed parse, unknown moon phase: "${moon}"!`)
     }
     if (
       typeof _s === 'string' &&
-      !(phase.toUpperCase() in OVERHEARD_ORB_STATES)
+      !(phase?.toUpperCase() in OVERHEARD_ORB_STATES)
     ) {
       throw new Error(`failed parse, unknown scroll phase: "${phase}"!`)
     }
     return {
-      moon: moon.replace(/\s/g, '_') as MoonPhase,
+      moon: moon as MoonPhase,
       online,
       scrolls:
         scrolls?.split(/[,\s]+and\s/g)?.map((name): ScrollState => {
