@@ -89,7 +89,7 @@ export class Overheard extends EventEmitter {
    */
   private parse(text: string): GameState {
     const [_f, _online, _moon, scrolls, phase] =
-      /(?:There\sare\s(\d+)\schampions)(?:.*The\smoon\sis\s(?:a|in\sits)\s([\w\s]+))(?:.*Rumor\shas\sit\sthat\s([\w\s]+)\sscrolls\sare\s(\w+))?/.exec(
+      /(?:There\sare\s(\d+)\schampions)(?:.*The\smoon\sis\s(?:a\s|in\sits\s)?([\w\s]+))(?:.*Rumor\shas\sit\sthat\s([\w\s]+)\sscrolls\sare\s(\w+))?/.exec(
         text,
       ) ?? []
     const online = parseInt(_online, 10)
