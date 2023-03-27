@@ -88,8 +88,8 @@ export class Overheard extends EventEmitter {
    * @returns    - Game state
    */
   private parse(text: string): GameState {
-    const [_f, _online, _moon, _s, scrolls, phase] =
-      /There\sare\s(\d+)\schampions\sadventuring\sacross\sthe\srealms\s\w+,\smore\sor\sless\..*?The\smoon\sis\s?a?\s([\w\s]+)\.<br><br>(Rumor\shas\sit\sthat\s(.*)\sscrolls\sare\s(dark|glowing)\.)?/.exec(
+    const [_f, _online, _moon, scrolls, phase] =
+      /(?:There\sare\s(\d+)\schampions).*(?:The\smoon\sis\s(?:a|in\sits)\s([\w\s]+))(?:.*Rumor\shas\sit\sthat\s([\w\s]+)are\s(\w+))?/.exec(
         text,
       ) ?? []
     const online = parseInt(_online, 10)
@@ -100,11 +100,14 @@ export class Overheard extends EventEmitter {
     if (isNaN(online)) {
       throw new Error(`failed parse, invalid online: "${online}"!`)
     }
-    if (typeof moon !== 'string' || !(moon?.toUpperCase() in OVERHEARD_MOON_STATES)) {
+    if (
+      typeof moon !== 'string' ||
+      !(moon?.toUpperCase() in OVERHEARD_MOON_STATES)
+    ) {
       throw new Error(`failed parse, unknown moon phase: "${moon}"!`)
     }
     if (
-      typeof _s === 'string' &&
+      typeof phase === 'string' &&
       !(phase?.toUpperCase() in OVERHEARD_ORB_STATES)
     ) {
       throw new Error(`failed parse, unknown scroll phase: "${phase}"!`)
