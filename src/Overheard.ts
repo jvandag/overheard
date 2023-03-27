@@ -143,18 +143,26 @@ export class Overheard extends EventEmitter {
       this.emit('online', state.online)
       this._cache.online = state.online
     }
-    this.scrolls().forEach(({ name, phase }) => {
-      const scroll = state.scrolls.find((s) => s.name === name)
-      if (typeof scroll !== 'undefined') {
-        if (scroll.phase !== phase) {
-          this._cache.scrolls[name] = scroll.phase
-          this.emit('scrolls', scroll)
+    const scrolls = this.scrolls().reduce(
+      (acc: ScrollState[], cur: ScrollState): ScrollState[] => {
+        const stateScroll = state.scrolls.find((s) => s.name === cur.name)
+        if (typeof stateScroll !== 'undefined') {
+          if (stateScroll.phase !== cur.phase) {
+            return [...acc, cur]
+          }
+        } else if (cur.phase === 'dark' || cur.phase === 'glowing') {
+          return [...acc, { ...cur, phase: 'normal' }]
         }
-      } else if (phase === 'dark' || phase === 'glowing') {
-        this._cache.scrolls[name] = 'normal'
-        this.emit('scrolls', { name, phase: 'normal' })
-      }
-    })
+        return acc
+      },
+      [],
+    )
+    if (scrolls.length > 0) {
+      this.emit('scrolls', scrolls)
+      scrolls.forEach(({ name, phase }) => {
+        this._cache.scrolls[name] = phase
+      })
+    }
   }
 
   /**

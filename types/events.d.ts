@@ -47,5 +47,5 @@ export interface OverheardEvent {
   done: undefined
   online: number
   moon: MoonPhase
-  scrolls: ScrollState
+  scrolls: ScrollState[]
 }
