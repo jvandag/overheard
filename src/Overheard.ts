@@ -148,7 +148,7 @@ export class Overheard extends EventEmitter {
         const stateScroll = state.scrolls.find((s) => s.name === cur.name)
         if (typeof stateScroll !== 'undefined') {
           if (stateScroll.phase !== cur.phase) {
-            return [...acc, cur]
+            return [...acc, stateScroll]
           }
         } else if (cur.phase === 'dark' || cur.phase === 'glowing') {
           return [...acc, { ...cur, phase: 'normal' }]
