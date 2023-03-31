@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/dot-notation */
 
 import { Overheard } from '../Overheard'
-import type { MoonPhase, ScrollState } from 'types'
 
 const OVERHEARD_NOTHING =
   '<html><head><title>Overheard</title></head><body bgcolor="#f5f3e4"><div align="center"><h1>Overheard in Tavelor\'s Tavern</h1></div><div align="left">There are 70 champions adventuring across the realms today, more or less.<br><br>The moon is a waning gibbous.<br><br>There are no reports of glowing or dark scrolls.<br><br></body></html>'
@@ -25,30 +24,25 @@ describe('Overheard.', () => {
 
   it('Should emit events', (done) => {
     const overheard = new Overheard({})
-    let online: number
-    let moon: MoonPhase
-    let scrolls: ScrollState[]
+    overheard['fetch'] = async (url) => {
+      return OVERHEARD_GLOWING
+    }
     overheard
-      .once('scrolls', (s) => {
-        scrolls = s
-      })
-      .once('online', (o) => {
-        online = o
-      })
-      .once('moon', (phase) => {
-        moon = phase
-      })
-      .once('done', () => {
+      .once('scrolls', (scrolls) => {
         expect(scrolls).toStrictEqual([
           { name: 'necromancy', phase: 'glowing' },
           { name: 'conjuration', phase: 'glowing' },
         ])
-        expect(moon).toBe('waning_gibbous')
-        expect(online).toBe(70)
-        done()
       })
-    overheard['diff'](overheard['parse'](OVERHEARD_GLOWING))
-    overheard.emit('done', undefined)
+      .once('online', (online) => {
+        expect(online).toBe(70)
+      })
+      .once('moon', (phase) => {
+        expect(phase).toBe('waning_gibbous')
+      })
+      .once('done', done)
+      .start()
+      .stop()
   })
 
   it('Should return to normal', (done) => {
@@ -61,13 +55,17 @@ describe('Overheard.', () => {
         },
       },
     )
-    overheard.once('scrolls', (scrolls) => {
-      expect(scrolls).toStrictEqual([
-        { name: 'necromancy', phase: 'normal' },
-        { name: 'conjuration', phase: 'normal' },
-      ])
-      done()
-    })
-    overheard['diff'](overheard['parse'](OVERHEARD_NOTHING))
+    overheard['fetch'] = async (url) => {
+      return OVERHEARD_NOTHING
+    }
+    overheard
+      .once('scrolls', (scrolls) => {
+        expect(scrolls).toStrictEqual([
+          { name: 'necromancy', phase: 'normal' },
+          { name: 'conjuration', phase: 'normal' },
+        ])
+      })
+      .once('done', done)
+      .start()
   })
 })
