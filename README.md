@@ -24,6 +24,7 @@ const over = new Overheard(
 
 // === Listening for events ===
 over
+  .on('error', console.log)   // failed parse, invalid content "<html>504</html>"!
   .on('online', console.log)  // 100
   .on('moon', console.log)    // nearly_full
   .on('scrolls', console.log) // { name: 'necromancy', phase: 'normal' }
