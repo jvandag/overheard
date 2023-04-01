@@ -1,4 +1,6 @@
 # @aberoth-community/overheard
+> ![CI](https://github.com/aberoth-community/overheard/actions/workflows/ci.yml/badge.svg)
+
 A simple Aberoth ["Overheard"](https://aberoth.com/highscore/overheard.html) scraper library & cli.
 
 ### Usage:
