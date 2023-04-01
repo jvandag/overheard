@@ -87,7 +87,7 @@ export class Overheard extends EventEmitter {
    * @param text - Page text
    * @returns    - Game state
    */
-  private parse(text: string): GameState {
+  private parse(text: string): GameState | null {
     const [_f, _online, _moon, scrolls, phase] =
       /(?:There\sare\s(\d+)\schampions)(?:.*The\smoon\sis\s(?:a\s|in\sits\s)?([\w\s]+))(?:.*Rumor\shas\sit\sthat\s([\w\s]+)\sscrolls\sare\s(\w+))?/.exec(
         text,
@@ -95,22 +95,26 @@ export class Overheard extends EventEmitter {
     const online = parseInt(_online, 10)
     const moon = _moon?.replace(/\s/g, '_')
     if (typeof _f !== 'string') {
-      throw new Error('failed parse, invalid content!')
+      this.emit('error', new Error(`failed parse, invalid content "${text}"!`))
+      return null
     }
     if (isNaN(online)) {
-      throw new Error(`failed parse, invalid online: "${online}"!`)
+      this.emit('error', new Error(`failed parse, invalid online: "${online}"!`))
+      return null
     }
     if (
       typeof moon !== 'string' ||
       !(moon?.toUpperCase() in OVERHEARD_MOON_STATES)
     ) {
-      throw new Error(`failed parse, unknown moon phase: "${moon}"!`)
+      this.emit('error', new Error(`failed parse, unknown moon phase: "${moon}"!`))
+      return null
     }
     if (
       typeof phase === 'string' &&
       !(phase?.toUpperCase() in OVERHEARD_ORB_STATES)
     ) {
-      throw new Error(`failed parse, unknown scroll phase: "${phase}"!`)
+      this.emit('error', new Error(`failed parse, unknown scroll phase: "${phase}"!`))
+      return null
     }
     return {
       moon: moon as MoonPhase,
@@ -247,7 +251,11 @@ export class Overheard extends EventEmitter {
   next(): void {
     this.fetch(OVERHEARD_URL)
       .then((html) => this.parse(html))
-      .then((state) => this.diff(state))
+      .then((state) => {
+        if (state !== null) {
+          this.diff(state)
+        }
+      })
       .finally(() => {
         if (!isNaN(this._opts?.time ?? NaN)) {
           this.timeout = setTimeout(() => {

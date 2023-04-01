@@ -44,6 +44,7 @@ export interface GameState {
 
 /** Overheard class events */
 export interface OverheardEvent {
+  error: Error
   done: undefined
   online: number
   moon: MoonPhase

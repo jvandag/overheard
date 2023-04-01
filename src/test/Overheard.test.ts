@@ -22,11 +22,21 @@ describe('Overheard.', () => {
     })
   })
 
+  it('Should emit invalid content.', (done) => {
+    const overheard = new Overheard({})
+    overheard['fetch'] = async (url) => ''
+    overheard
+      .on('error', (err) => {
+        expect(err).toBeInstanceOf(Error)
+        expect(err.message).toBe('failed parse, invalid content ""!')
+        done()
+      })
+      .start()
+  })
+
   it('Should emit events', (done) => {
     const overheard = new Overheard({})
-    overheard['fetch'] = async (url) => {
-      return OVERHEARD_GLOWING
-    }
+    overheard['fetch'] = async (url) => OVERHEARD_GLOWING
     overheard
       .once('scrolls', (scrolls) => {
         expect(scrolls).toStrictEqual([
@@ -42,7 +52,6 @@ describe('Overheard.', () => {
       })
       .once('done', done)
       .start()
-      .stop()
   })
 
   it('Should return to normal', (done) => {
@@ -55,9 +64,7 @@ describe('Overheard.', () => {
         },
       },
     )
-    overheard['fetch'] = async (url) => {
-      return OVERHEARD_NOTHING
-    }
+    overheard['fetch'] = async (url) => OVERHEARD_NOTHING
     overheard
       .once('scrolls', (scrolls) => {
         expect(scrolls).toStrictEqual([
