@@ -26,7 +26,7 @@
       "files": ["*.ts"],
       "extends": ["standard-with-typescript"],
       "parserOptions": {
-        "project": "tsconfig.json"
+        "project": "tsconfig.eslint.json"
       },
       "rules": {
         "@typescript-eslint/comma-dangle": 0,
