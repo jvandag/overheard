@@ -92,7 +92,7 @@ export class Overheard extends EventEmitter {
       /(?:There\sare\s(\d+)\schampions)(?:.*The\smoon\sis\s(?:a\s|in\sits\s)?([\w\s]+))(?:.*Rumor\shas\sit\sthat\s([\w\s]+)\sscrolls\sare\s(\w+))?/.exec(
         text,
       ) ?? []
-    const online = parseInt(_online, 10)
+    const online = parseInt(_online ?? NaN, 10)
     const moon = _moon?.replace(/\s/g, '_')
     if (typeof _f !== 'string') {
       this.emit('error', new Error(`failed parse, invalid content "${text}"!`))
@@ -129,17 +129,26 @@ export class Overheard extends EventEmitter {
       moon: moon as MoonPhase,
       online,
       scrolls:
-        scrolls?.split(/[,\s]+and\s/g)?.map((name): ScrollState => {
-          if (
-            !Object.values(OVERHEARD_SCHOOL_NAMES).includes(name as SchoolName)
-          ) {
-            throw new Error(`failed parse, unknown scroll name: "${name}"!`)
-          }
-          return {
-            name: name as SchoolName,
-            phase: phase as OrbPhase,
-          }
-        }) ?? [],
+        scrolls
+          ?.split(/[,\s]+and\s/g)
+          ?.map((name): ScrollState | null => {
+            if (
+              !Object.values(OVERHEARD_SCHOOL_NAMES).includes(
+                name as SchoolName,
+              )
+            ) {
+              this.emit(
+                'error',
+                new Error(`failed parse, unknown scroll name: "${name}"!`),
+              )
+              return null
+            }
+            return {
+              name: name as SchoolName,
+              phase: phase as OrbPhase,
+            }
+          })
+          .filter((s): s is ScrollState => s !== null) ?? [],
     }
   }
 
