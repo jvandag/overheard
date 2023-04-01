@@ -3,7 +3,27 @@
 
 A simple Aberoth ["Overheard"](https://aberoth.com/highscore/overheard.html) scraper library & cli.
 
-### Usage:
+## Command-line usage:
+Binary downloads: [link](https://github.com/aberoth-community/overheard/releases)
+```
+$ ./overheard --help
+Usage: overheard [options]
+
+Options:
+  -t, --time <time>  scan interval
+  -q, --quiet        disable output (default: false)
+  -v, --version      output the version number
+  -h, --help         display help for command
+```
+
+### Shell-scripting:
+> See: [scripts/sqlite.sh](scripts/sqlite.sh), [scripts/popen.py](scripts/popen.py)
+```bash
+./overheard -i 10s \
+  | xargs -I {} bash -c 'command {}'
+```
+
+## Usage:
 ```javascript
 import { OVERHEARD_SCHOOL_NAMES, Overheard } from '@aberoth-community/overheard'
 
@@ -45,23 +65,4 @@ console.log(
   over.moon(),     // nearly_full
   over.online(),   // 100
 )
-```
-
-### Command-line usage:
-> `./overheard --help`
-```
-Usage: overheard [options]
-
-Options:
-  -t, --time <time>  scan interval
-  -q, --quiet        disable output (default: false)
-  -v, --version      output the version number
-  -h, --help         display help for command
-```
-
-### Shell scripting:
-> See: [scripts/sqlite.sh](scripts/sqlite.sh), [scripts/popen.py](scripts/popen.py)
-```bash
-./overheard -i 10s \
-  | xargs -I {} bash -c 'command {}'
 ```
