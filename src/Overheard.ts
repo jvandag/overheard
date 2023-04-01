@@ -99,21 +99,30 @@ export class Overheard extends EventEmitter {
       return null
     }
     if (isNaN(online)) {
-      this.emit('error', new Error(`failed parse, invalid online: "${online}"!`))
+      this.emit(
+        'error',
+        new Error(`failed parse, invalid online: "${online}"!`),
+      )
       return null
     }
     if (
       typeof moon !== 'string' ||
       !(moon?.toUpperCase() in OVERHEARD_MOON_STATES)
     ) {
-      this.emit('error', new Error(`failed parse, unknown moon phase: "${moon}"!`))
+      this.emit(
+        'error',
+        new Error(`failed parse, unknown moon phase: "${moon}"!`),
+      )
       return null
     }
     if (
       typeof phase === 'string' &&
       !(phase?.toUpperCase() in OVERHEARD_ORB_STATES)
     ) {
-      this.emit('error', new Error(`failed parse, unknown scroll phase: "${phase}"!`))
+      this.emit(
+        'error',
+        new Error(`failed parse, unknown scroll phase: "${phase}"!`),
+      )
       return null
     }
     return {

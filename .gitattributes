@@ -2,8 +2,11 @@
 
 *.md               text diff=markdown
 *.json             text
+*.yaml             text
+*.yml              text
 package-lock.json  text -diff
 
+.husky/**/*        text eol=lf
 *.sh               text eol=lf
 
 *.cjs              text
