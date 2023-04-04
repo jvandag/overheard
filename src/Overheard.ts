@@ -89,10 +89,10 @@ export class Overheard extends EventEmitter {
    */
   private parse(text: string): GameState | null {
     const [_f, _online, _moon, scrolls, phase] =
-      /(?:There\sare\s(\d+)\schampions)(?:.*The\smoon\sis\s(?:a\s|in\sits\s)?([\w\s]+))(?:.*Rumor\shas\sit\sthat\s([\w\s]+)\sscrolls\sare\s(\w+))?/.exec(
+      /(?:There\sare\s(\d+|very\sfew)\schampions)(?:.*The\smoon\sis\s(?:a\s|in\sits\s)?([\w\s]+))(?:.*Rumor\shas\sit\sthat\s([\w\s]+)\sscrolls\sare\s(\w+))?/.exec(
         text,
       ) ?? []
-    const online = parseInt(_online ?? NaN, 10)
+    const online = _online !== 'very few' ? parseInt(_online ?? NaN, 10) : 0
     const moon = _moon?.replace(/\s/g, '_')
     if (typeof _f !== 'string') {
       this.emit('error', new Error(`failed parse, invalid content "${text}"!`))

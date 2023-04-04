@@ -29,6 +29,12 @@ describe('Overheard.', () => {
     })
   })
 
+  it('Should parse very few online.', () => {
+    const overheard = new Overheard({})
+    const res = overheard['parse'](template('very few'))
+    expect(res?.online).toBe(0)
+  })
+
   it('Should emit invalid content.', (done) => {
     const overheard = new Overheard({})
     overheard['fetch'] = async (url) => ''
