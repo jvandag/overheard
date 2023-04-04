@@ -93,11 +93,14 @@ export class Overheard extends EventEmitter {
         text,
       ) ?? []
     const online = _online !== 'very few' ? parseInt(_online ?? NaN, 10) : 0
-    const moon = _moon?.replace(/\s/g, '_')
+    const moon = _moon?.replace(/\s/g, '_') as MoonPhase
+
+    // Check regex matched
     if (typeof _f !== 'string') {
       this.emit('error', new Error(`failed parse, invalid content "${text}"!`))
       return null
     }
+    // Check online
     if (isNaN(online)) {
       this.emit(
         'error',
@@ -105,6 +108,7 @@ export class Overheard extends EventEmitter {
       )
       return null
     }
+    // Check moon phase
     if (
       typeof moon !== 'string' ||
       !(moon?.toUpperCase() in OVERHEARD_MOON_STATES)
@@ -115,6 +119,7 @@ export class Overheard extends EventEmitter {
       )
       return null
     }
+    // Check scroll phase
     if (
       typeof phase === 'string' &&
       !(phase?.toUpperCase() in OVERHEARD_ORB_STATES)
@@ -125,30 +130,28 @@ export class Overheard extends EventEmitter {
       )
       return null
     }
+
     return {
-      moon: moon as MoonPhase,
+      moon,
       online,
-      scrolls:
-        scrolls
-          ?.split(/[,\s]+and\s/g)
-          ?.map((name): ScrollState | null => {
-            if (
-              !Object.values(OVERHEARD_SCHOOL_NAMES).includes(
-                name as SchoolName,
-              )
-            ) {
-              this.emit(
-                'error',
-                new Error(`failed parse, unknown scroll name: "${name}"!`),
-              )
-              return null
-            }
-            return {
-              name: name as SchoolName,
-              phase: phase as OrbPhase,
-            }
-          })
-          .filter((s): s is ScrollState => s !== null) ?? [],
+      scrolls: (scrolls?.split(/[,\s]+and\s/g) ?? [])
+        .map((name): ScrollState | null => {
+          // Check scroll name
+          if (
+            !Object.values(OVERHEARD_SCHOOL_NAMES).includes(name as SchoolName)
+          ) {
+            this.emit(
+              'error',
+              new Error(`failed parse, unknown scroll name: "${name}"!`),
+            )
+            return null
+          }
+          return {
+            name: name as SchoolName,
+            phase: phase as OrbPhase,
+          }
+        })
+        .filter((s): s is ScrollState => s !== null),
     }
   }
 
@@ -158,21 +161,23 @@ export class Overheard extends EventEmitter {
    */
   private diff(state: GameState): void {
     if (state.moon !== this._cache.moon) {
-      this.emit('moon', state.moon)
       this._cache.moon = state.moon
+      this.emit('moon', this._cache.moon)
     }
     if (state.online !== this._cache.online) {
-      this.emit('online', state.online)
       this._cache.online = state.online
+      this.emit('online', this._cache.online)
     }
     const scrolls = this.scrolls().reduce(
       (acc: ScrollState[], cur: ScrollState): ScrollState[] => {
-        const stateScroll = state.scrolls.find((s) => s.name === cur.name)
-        if (typeof stateScroll !== 'undefined') {
-          if (stateScroll.phase !== cur.phase) {
-            return [...acc, stateScroll]
+        const newScroll = state.scrolls.find((s) => s.name === cur.name)
+        if (typeof newScroll !== 'undefined') {
+          // Set scroll glowing / dark
+          if (newScroll.phase !== cur.phase) {
+            return [...acc, newScroll]
           }
         } else if (cur.phase === 'dark' || cur.phase === 'glowing') {
+          // Set scroll normal
           return [...acc, { ...cur, phase: 'normal' }]
         }
         return acc
@@ -180,10 +185,10 @@ export class Overheard extends EventEmitter {
       [],
     )
     if (scrolls.length > 0) {
-      this.emit('scrolls', scrolls)
       scrolls.forEach(({ name, phase }) => {
         this._cache.scrolls[name] = phase
       })
+      this.emit('scrolls', scrolls)
     }
   }
 
