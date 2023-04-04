@@ -62,7 +62,7 @@ describe('Overheard.', () => {
         expect(online).toBe(70)
       })
       .once('moon', (phase) => {
-        expect(phase).toBe('waning_gibbous')
+        expect(phase).toBe('new')
       })
       .once('done', done)
       .start()
