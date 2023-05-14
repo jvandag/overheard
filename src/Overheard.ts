@@ -89,7 +89,7 @@ export class Overheard extends EventEmitter {
    */
   private parse(text: string): GameState | null {
     const [_f, _online, _moon, scrolls, phase] =
-      /(?:There\sare\s(\d+|very\sfew)\schampions)(?:.*The\smoon\sis\s(?:a\s|in\sits\s)?([\w\s]+))(?:.*Rumor\shas\sit\sthat\s([\w\s]+)\sscrolls\sare\s(\w+))?/.exec(
+      /(?:There are (\d+|very few) champions)(?:.*The moon is (?:a |in its )?([\w\s]+))(?:.*Rumor has it that ([\w\s,]+) scrolls are (\w+))?/.exec(
         text,
       ) ?? []
     const online = _online !== 'very few' ? parseInt(_online ?? NaN, 10) : 0
@@ -134,7 +134,7 @@ export class Overheard extends EventEmitter {
     return {
       moon,
       online,
-      scrolls: (scrolls?.split(/[,\s]+and\s/g) ?? [])
+      scrolls: (scrolls?.split(/,\s(?:and\s)?/g) ?? [])
         .map((name): ScrollState | null => {
           // Check scroll name
           if (
