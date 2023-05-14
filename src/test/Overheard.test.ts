@@ -16,7 +16,7 @@ describe('Overheard.', () => {
       template(
         '150',
         'waning gibbous',
-        'necromancy and conjuration scrolls are glowing',
+        'necromancy, and conjuration scrolls are glowing',
       ),
     )
     expect(res).toStrictEqual({
