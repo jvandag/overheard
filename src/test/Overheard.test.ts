@@ -7,7 +7,7 @@ const template = (
   moon = 'new',
   scrolls = 'There are no reports of glowing or dark scrolls',
 ): string =>
-  `<html><head><title>Overheard</title></head><body bgcolor="#f5f3e4"><div align="center"><h1>Overheard in Tavelor's Tavern</h1></div><div align="left">There are ${online} champions adventuring across the realms today, more or less.<br><br>The moon is a ${moon}.<br><br>Rumor has it that ${scrolls}.<br><br></body></html>`
+  `<html><head><title>Overheard</title></head><body bgcolor="#f5f3e4"><div align="center"><h1>Overheard in Tavelor's Tavern</h1></div><div align="left">There are ${online} champions adventuring across the realms today, more or less.<br><br>The moon is ${moon}.<br><br>Rumor has it that ${scrolls}.<br><br></body></html>`
 
 describe('Overheard.', () => {
   it('Should parse properties', () => {
