@@ -1,6 +1,6 @@
 {
   "name": "@aberoth-community/overheard",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "A simple overheard scraper",
   "main": "./dist/index.js",
   "bin": "./dist/index.js",
