@@ -134,7 +134,7 @@ export class Overheard extends EventEmitter {
     return {
       moon,
       online,
-      scrolls: (scrolls?.split(/,\s(?:and\s)?/g) ?? [])
+      scrolls: (scrolls?.split(/,?\s(?:and\s)?/g) ?? [])
         .map((name): ScrollState | null => {
           // Check scroll name
           if (

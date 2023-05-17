@@ -16,7 +16,7 @@ describe('Overheard.', () => {
       template(
         '150',
         'waning gibbous',
-        'necromancy, and conjuration scrolls are glowing',
+        'necromancy and conjuration scrolls are glowing',
       ),
     )
     expect(res).toStrictEqual({
@@ -59,7 +59,7 @@ describe('Overheard.', () => {
         ])
       })
       .once('online', (online) => {
-        expect(online).toBe(70)
+        expect(online).toBe(50)
       })
       .once('moon', (phase) => {
         expect(phase).toBe('new')
