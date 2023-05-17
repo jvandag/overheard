@@ -3,7 +3,7 @@
 import { Overheard } from '../Overheard'
 
 const template = (
-  online = '50',
+  online: number | 'very few' = 50,
   moon = 'new',
   scrolls = 'There are no reports of glowing or dark scrolls',
 ): string =>
@@ -14,7 +14,7 @@ describe('Overheard.', () => {
     const overheard = new Overheard({})
     const res = overheard['parse'](
       template(
-        '150',
+        150,
         'waning gibbous',
         'necromancy and conjuration scrolls are glowing',
       ),
@@ -35,6 +35,24 @@ describe('Overheard.', () => {
     expect(res?.online).toBe(0)
   })
 
+  it('Should parse inconsistent commas.', () => {
+    const overheard = new Overheard({})
+    expect(
+      overheard['parse'](
+        template(
+          50,
+          'new',
+          'necromancy, divination, and conjuration scrolls are glowing',
+        ),
+      ),
+    ).not.toEqual(null)
+    expect(
+      overheard['parse'](
+        template(50, 'new', 'necromancy and conjuration scrolls are glowing'),
+      ),
+    ).not.toEqual(null)
+  })
+
   it('Should emit invalid content.', (done) => {
     const overheard = new Overheard({})
     overheard['fetch'] = async (url) => ''
@@ -50,7 +68,7 @@ describe('Overheard.', () => {
   it('Should emit events', (done) => {
     const overheard = new Overheard({})
     overheard['fetch'] = async (url) =>
-      template('50', 'new', 'necromancy and conjuration scrolls are glowing')
+      template(50, 'new', 'necromancy and conjuration scrolls are glowing')
     overheard
       .once('scrolls', (scrolls) => {
         expect(scrolls).toStrictEqual([
