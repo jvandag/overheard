@@ -13,8 +13,8 @@
     "build:dev": "tsc --sourceMap",
     "build:pkg": "pkg .",
     "lint": "eslint .",
-    "format": "prettier -c --write \"**/*.{cjs,mjs,js,json,ts}\"",
-    "format:check": "prettier --list-different \"**/*.{cjs,mjs,js,json,ts}\"",
+    "format": "prettier -c --write \"**/*.{md,cjs,mjs,js,json,ts}\"",
+    "format:check": "prettier --list-different \"**/*.{md,cjs,mjs,js,json,ts}\"",
     "prepare": "husky install",
     "test": "jest"
   },
