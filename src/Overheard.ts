@@ -277,6 +277,7 @@ export class Overheard extends EventEmitter {
       .then((state) => {
         if (state !== null) {
           this.diff(state)
+           this.emit('success', undefined)
         }
       })
       .finally(() => {
